@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NDTV Cartesia Demo — Powered by Cartesia</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ndtv-red:#8B1A1A;--ndtv-deeper:#0A0A0A;--card-bg:#141414;--card-border:rgba(139,26,26,0.2);--text-primary:#F5F5F5;--text-secondary:#A0A0A0;--accent:#8B1A1A;--accent-glow:rgba(139,26,26,0.3)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Source Sans 3','Noto Sans Devanagari',sans-serif;background:var(--ndtv-deeper);color:var(--text-primary);min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 0%,rgba(139,26,26,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(139,26,26,0.04) 0%,transparent 50%);pointer-events:none;z-index:0}
+  .header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,26,26,0.3);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+  .header-left{display:flex;align-items:center;gap:16px}
+  .ndtv-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:28px;color:var(--ndtv-red)}
+  .header-divider{width:1px;height:28px;background:rgba(255,255,255,0.12)}
+  .header-subtitle{font-size:13px;font-weight:300;color:var(--text-secondary);letter-spacing:2px;text-transform:uppercase}
+  .header-badge{font-size:11px;font-weight:600;color:var(--ndtv-red);background:rgba(139,26,26,0.1);border:1px solid rgba(139,26,26,0.3);padding:4px 12px;border-radius:20px;letter-spacing:1px;text-transform:uppercase}
+  .container{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:40px 24px}
+  .page-title{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;margin-bottom:8px;line-height:1.15}
+  .page-title span{color:var(--ndtv-red)}
+  .page-desc{color:var(--text-secondary);font-size:16px;font-weight:300;margin-bottom:40px;max-width:620px;line-height:1.6}
+  .snippets-grid{display:flex;flex-direction:column;gap:32px}
+  .snippet-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;overflow:hidden;transition:border-color 0.3s;animation:fadeUp 0.5s ease-out both}
+  .snippet-card:nth-child(1){animation-delay:0.05s}.snippet-card:nth-child(2){animation-delay:0.15s}.snippet-card:nth-child(3){animation-delay:0.25s}
+  .snippet-card:hover{border-color:rgba(139,26,26,0.4)}
+  .snippet-top{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.04)}
+  .snippet-category{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ndtv-red)}
+  .snippet-lang{font-size:11px;font-weight:600;color:var(--text-secondary);background:rgba(255,255,255,0.05);padding:3px 10px;border-radius:4px}
+  .snippet-body{padding:24px}
+  .snippet-headline{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;line-height:1.3;margin-bottom:12px}
+  .snippet-text{font-size:15px;line-height:1.7;color:var(--text-secondary);font-weight:300;margin-bottom:28px}
+  .control-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-secondary);margin-bottom:10px}
+  .pill-group{display:flex;gap:0;margin-bottom:20px}
+  .pill-btn{padding:9px 18px;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;color:var(--text-secondary);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .pill-btn:first-child{border-radius:8px 0 0 8px}.pill-btn:last-child{border-radius:0 8px 8px 0}.pill-btn:not(:first-child){border-left:none}
+  .pill-btn.active{background:rgba(139,26,26,0.15);border-color:var(--ndtv-red);color:#fff;z-index:1}
+  .pill-btn.active+.pill-btn{border-left:1px solid rgba(255,255,255,0.08)}
+  .pill-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--ndtv-red),#5C1111);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  .player-wrap{border-radius:12px;padding:20px;background:linear-gradient(135deg,rgba(139,26,26,0.1),rgba(139,26,26,0.03));border:1px solid rgba(139,26,26,0.25)}
+  .player-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .player-title{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+  .player-sub{font-size:12px;color:var(--text-secondary);font-weight:300}
+  .audio-player{display:flex;align-items:center;gap:12px}
+  .play-btn{width:48px;height:48px;border-radius:50%;border:none;background:var(--accent);box-shadow:0 4px 20px var(--accent-glow);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+  .play-btn:hover{transform:scale(1.08)}.play-btn:active{transform:scale(0.95)}
+  .play-btn svg{width:20px;height:20px;fill:#fff}
+  .audio-track{flex:1;display:flex;flex-direction:column;gap:6px}
+  .waveform-bar{height:40px;background:rgba(255,255,255,0.04);border-radius:8px;position:relative;overflow:hidden;cursor:pointer}
+  .waveform-progress{height:100%;width:0%;border-radius:8px;transition:width 0.1s linear;background:linear-gradient(90deg,rgba(139,26,26,0.4),rgba(139,26,26,0.1))}
+  .waveform-visual{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:2px;padding:0 10px}
+  .waveform-visual .bar{width:3px;border-radius:2px;background:var(--accent);opacity:0.25;transition:height 0.12s,opacity 0.12s}
+  .audio-time{font-size:11px;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+  .footer{text-align:center;padding:48px 24px 32px;color:var(--text-secondary);font-size:12px;font-weight:300;letter-spacing:1px}
+  .footer a{color:var(--accent);text-decoration:none}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:640px){.page-title{font-size:28px}.header{padding:12px 16px}.snippet-body{padding:16px}.pill-btn{padding:8px 12px;font-size:12px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="ndtv-logo">NDTV</div>
+    <div class="header-divider"></div>
+    <div class="header-subtitle">Cartesia Demo</div>
+  </div>
+  <div class="header-badge"> Confidential &mdash; do not share </div>
+</div>
+
+<div class="container">
+  <h1 class="page-title">News in <span>Their Voice</span></h1>
+  <p class="page-desc">Pick your favourite journalist and hear them read the news (Using Cartesia&rsquo;s Voice Cloning).</p>
+  <div class="snippets-grid" id="grid"></div>
+</div>
+
+<div class="footer">
+  Demo built for NDTV by <a href="https://cartesia.ai" target="_blank">Cartesia</a> &middot; Confidential
+</div>
+
+<script>
+// ============================================================
+//  UPDATE THIS to your GitHub Pages or raw URL
+//  e.g. 'https://yourusername.github.io/ndtv-demo/audio'
+//  or   'https://raw.githubusercontent.com/you/repo/main/audio'
+// ============================================================
+var AUDIO_BASE_URL = 'audio';
+var AUDIO_EXT = 'wav';
+
+// File naming convention:
+//   audio/economy-ravish.wav
+//   audio/economy-nidhi.wav
+//   audio/economy-barkha.wav
+//   audio/delhi-ravish.wav
+//   audio/delhi-nidhi.wav
+//   audio/delhi-barkha.wav
+//   audio/isro-ravish.wav
+//   audio/isro-nidhi.wav
+//   audio/isro-barkha.wav
+
+var SNIPPETS = [
+  { id:'economy', cat:'Economy', lang:'English',
+    hl:'India Overtakes Japan as World\u2019s Fourth-Largest Economy',
+    txt:'India has officially surpassed Japan to become the world\u2019s fourth-largest economy by nominal GDP, according to the latest IMF projections. The milestone comes as India\u2019s economy continues to grow at over seven percent annually, driven by a booming services sector and strong domestic consumption. Finance Minister Nirmala Sitharaman called it a \u201Chistoric moment\u201D while emphasizing that per-capita income growth remains the real challenge ahead.' },
+  { id:'delhi', cat:'\u0930\u093E\u091C\u0928\u0940\u0924\u093F', lang:'\u0939\u093F\u0928\u094D\u0926\u0940',
+    hl:'\u0926\u093F\u0932\u094D\u0932\u0940 \u0935\u093F\u0927\u093E\u0928\u0938\u092D\u093E \u091A\u0941\u0928\u093E\u0935: \u0938\u092D\u0940 \u0926\u0932\u094B\u0902 \u0928\u0947 \u091D\u094B\u0902\u0915\u0940 \u0924\u093E\u0915\u0924',
+    txt:'\u0926\u093F\u0932\u094D\u0932\u0940 \u0935\u093F\u0927\u093E\u0928\u0938\u092D\u093E \u091A\u0941\u0928\u093E\u0935 \u0915\u094B \u0932\u0947\u0915\u0930 \u0938\u092D\u0940 \u092A\u094D\u0930\u092E\u0941\u0916 \u0930\u093E\u091C\u0928\u0940\u0924\u093F\u0915 \u0926\u0932\u094B\u0902 \u0928\u0947 \u0905\u092A\u0928\u0940 \u092A\u0942\u0930\u0940 \u0924\u093E\u0915\u0924 \u091D\u094B\u0902\u0915 \u0926\u0940 \u0939\u0948\u0964 \u092D\u093E\u0930\u0924\u0940\u092F \u091C\u0928\u0924\u093E \u092A\u093E\u0930\u094D\u091F\u0940, \u0906\u092E \u0906\u0926\u092E\u0940 \u092A\u093E\u0930\u094D\u091F\u0940 \u0914\u0930 \u0915\u093E\u0902\u0917\u094D\u0930\u0947\u0938 \u0915\u0947 \u092C\u0940\u091A \u0915\u095C\u093E \u092E\u0941\u0915\u093E\u092C\u0932\u093E \u0926\u0947\u0916\u0928\u0947 \u0915\u094B \u092E\u093F\u0932 \u0930\u0939\u093E \u0939\u0948\u0964 \u092E\u0924\u0926\u093E\u0924\u093E\u0913\u0902 \u0915\u0947 \u0932\u093F\u090F \u092E\u0939\u0902\u0917\u093E\u0908, \u092A\u094D\u0930\u0926\u0942\u0937\u0923 \u0914\u0930 \u092A\u093E\u0928\u0940 \u0915\u0940 \u0938\u092E\u0938\u094D\u092F\u093E \u092A\u094D\u0930\u092E\u0941\u0916 \u092E\u0941\u0926\u094D\u0926\u0947 \u092C\u0928\u0947 \u0939\u0941\u090F \u0939\u0948\u0902\u0964 \u091A\u0941\u0928\u093E\u0935 \u0906\u092F\u094B\u0917 \u0928\u0947 \u0938\u092D\u0940 \u0924\u0948\u092F\u093E\u0930\u093F\u092F\u093E\u0902 \u092A\u0942\u0930\u0940 \u0915\u0930 \u0932\u0940 \u0939\u0948\u0902\u0964' },
+  { id:'isro', cat:'Technology', lang:'English',
+    hl:'ISRO\u2019s \u0917\u0917\u0928\u092F\u093E\u0928 Crew Module Completes Final Abort Test',
+    txt:'The \u092D\u093E\u0930\u0924\u0940\u092F \u0905\u0902\u0924\u0930\u093F\u0915\u094D\u0937 \u0905\u0928\u0941\u0938\u0902\u0927\u093E\u0928 \u0938\u0902\u0917\u0920\u0928 (ISRO) has successfully completed the final abort test for the \u0917\u0917\u0928\u092F\u093E\u0928 crew module, bringing \u092D\u093E\u0930\u0924 one step closer to its first crewed space mission. The test, conducted off the coast of \u0936\u094D\u0930\u0940\u0939\u0930\u093F\u0915\u094B\u091F\u093E, validated the crew escape system under the most demanding flight conditions. ISRO Chairman \u090F\u0938. \u0938\u094B\u092E\u0928\u093E\u0925 confirmed that \u0905\u0902\u0924\u0930\u093F\u0915\u094D\u0937\u092F\u093E\u0924\u094D\u0930\u0940 training is on track and the mission remains scheduled for next year.' },
+];
+
+var JOURNALISTS = [
+  { name:'Ravish Kumar', key:'ravish', ini:'RK' },
+  { name:'Nidhi Razdan', key:'nidhi', ini:'NR' },
+  { name:'Barkha Dutt', key:'barkha', ini:'BD' },
+];
+
+var sel = {};
+SNIPPETS.forEach(function(s) { sel[s.id] = 0; });
+var cache = {};
+
+function audioUrl(sid, jk) {
+  return AUDIO_BASE_URL + '/' + sid + '-' + jk + '.' + AUDIO_EXT;
+}
+
+function getAudio(sid, jk) {
+  var k = sid + '-' + jk;
+  if (cache[k]) return cache[k];
+  var a = new Audio(audioUrl(sid, jk));
+  a.preload = 'auto';
+  var o = { audio: a, playing: false };
+  a.addEventListener('timeupdate', function() { tickUI(sid, o); });
+  a.addEventListener('ended', function() { o.playing = false; iconUI(sid, false); });
+  cache[k] = o;
+  return o;
+}
+
+function cur(sid) { return getAudio(sid, JOURNALISTS[sel[sid]].key); }
+
+function stopAll() {
+  Object.keys(cache).forEach(function(k) {
+    if (cache[k].playing) { cache[k].audio.pause(); cache[k].playing = false; }
+  });
+}
+
+function toggle(sid) {
+  var o = cur(sid);
+  if (o.playing) { o.audio.pause(); o.playing = false; iconUI(sid, false); }
+  else { stopAll(); o.audio.play().catch(function(){}); o.playing = true; iconUI(sid, true); }
+}
+
+function iconUI(sid, playing) {
+  var el = document.getElementById('pi-' + sid);
+  if (!el) return;
+  el.innerHTML = playing
+    ? '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>'
+    : '<polygon points="6,3 20,12 6,21"/>';
+}
+
+function tickUI(sid, o) {
+  var pr = document.getElementById('pr-' + sid);
+  var tm = document.getElementById('tm-' + sid);
+  if (!pr) return;
+  pr.style.width = (o.audio.currentTime / o.audio.duration * 100) + '%';
+  function f(t) { return Math.floor(t / 60) + ':' + Math.floor(t % 60).toString().padStart(2, '0'); }
+  if (tm) tm.textContent = f(o.audio.currentTime) + ' / ' + f(o.audio.duration || 0);
+  var bars = document.querySelectorAll('#wv-' + sid + ' .bar');
+  for (var i = 0; i < bars.length; i++) {
+    if (o.playing) { bars[i].style.height = (Math.random() * 26 + 4) + 'px'; bars[i].style.opacity = '0.55'; }
+    else bars[i].style.opacity = '0.25';
+  }
+}
+
+function seekAt(e, sid) {
+  var o = cur(sid);
+  if (!o || !o.audio || !o.audio.duration) return;
+  var r = e.currentTarget.getBoundingClientRect();
+  o.audio.currentTime = ((e.clientX - r.left) / r.width) * o.audio.duration;
+}
+
+function pick(sid, idx) { stopAll(); sel[sid] = idx; render(); }
+
+function makeBars(n) {
+  n = n || 50; var s = '';
+  for (var i = 0; i < n; i++) s += '<div class="bar" style="height:' + (Math.random() * 22 + 5) + 'px"></div>';
+  return s;
+}
+
+function render() {
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  SNIPPETS.forEach(function(s) {
+    var ji = sel[s.id];
+    var j = JOURNALISTS[ji];
+    var card = document.createElement('div');
+    card.className = 'snippet-card';
+
+    var pillsHtml = '';
+    JOURNALISTS.forEach(function(jt, idx) {
+      pillsHtml += '<button class="pill-btn ' + (ji === idx ? 'active' : '') + '" data-sid="' + s.id + '" data-idx="' + idx + '">' +
+        '<div class="pill-avatar">' + jt.ini + '</div>' + jt.name + '</button>';
+    });
+
+    card.innerHTML =
+      '<div class="snippet-top"><span class="snippet-category">' + s.cat + '</span><span class="snippet-lang">' + s.lang + '</span></div>' +
+      '<div class="snippet-body">' +
+        '<h2 class="snippet-headline">' + s.hl + '</h2>' +
+        '<p class="snippet-text">' + s.txt + '</p>' +
+        '<div class="control-label">Read by</div>' +
+        '<div class="pill-group">' + pillsHtml + '</div>' +
+        '<div class="player-wrap">' +
+          '<div class="player-header">' +
+            '<span class="player-title">' + j.name + ' &middot; Cartesia</span>' +
+          '</div>' +
+          '<div class="audio-player">' +
+            '<button class="play-btn" data-sid="' + s.id + '">' +
+              '<svg viewBox="0 0 24 24" id="pi-' + s.id + '"><polygon points="6,3 20,12 6,21"/></svg>' +
+            '</button>' +
+            '<div class="audio-track">' +
+              '<div class="waveform-bar" id="wv-' + s.id + '" data-sid="' + s.id + '">' +
+                '<div class="waveform-progress" id="pr-' + s.id + '"></div>' +
+                '<div class="waveform-visual">' + makeBars() + '</div>' +
+              '</div>' +
+              '<div class="audio-time" id="tm-' + s.id + '">0:00 / 0:00</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    grid.appendChild(card);
+
+    card.querySelectorAll('.pill-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        pick(this.getAttribute('data-sid'), parseInt(this.getAttribute('data-idx')));
+      });
+    });
+    card.querySelector('.play-btn').addEventListener('click', function() {
+      toggle(this.getAttribute('data-sid'));
+    });
+    card.querySelector('.waveform-bar').addEventListener('click', function(e) {
+      seekAt(e, this.getAttribute('data-sid'));
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
